@@ -172,8 +172,8 @@ public extension Dictionary where Key == HTTPHeaderName, Value == String {
     set { self[.contentLanguage] = newValue }
   }
 
-  var contentLength: Int? {
-    get { return Int(self[.contentLength] ?? "") }
+  var contentLength: Int64? {
+    get { return Int64(self[.contentLength] ?? "") }
     set { self[.contentLength] = newValue == nil ? nil : "\(newValue!)" }
   }
 

@@ -69,6 +69,7 @@ open class HTTPFileHandler: HTTPRequestHandler {
       return HTTPResponse(.forbidden)
     }
 
+    
     // Construct a response
     let response = HTTPResponse()
     response.headers.contentType = fileManager.mimeType(of: url)
@@ -98,7 +99,10 @@ open class HTTPFileHandler: HTTPRequestHandler {
     } else {
       // Add the whole file as the response body
       response.status = .ok
-      response.body = try Data(contentsOf: url)
+      response.bodyFile = try FileHandle(forReadingFrom: url)
+      response.headers.contentType = fileManager.mimeType(of: url)
+      response.headers.lastModified = attributes.fileModificationDate()?.rfc1123
+      response.headers.contentLength = Int64(exactly: attributes.fileSize())!
     }
 
     return response

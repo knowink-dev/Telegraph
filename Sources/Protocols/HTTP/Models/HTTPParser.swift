@@ -210,9 +210,9 @@ extension HTTPParser {
     // Set the HTTP version
     message.version = rawParser.httpVersion
 
-    // Reserve capacity for the body
-    if let contentLength = message.headers.contentLength {
-      message.body.reserveCapacity(contentLength)
+    // Reserve capacity for the body, only if this isn't reading from a file
+    if message.bodyFile == nil, let contentLength = message.headers.contentLength {
+      message.body.reserveCapacity(Int(exactly: contentLength)!)
     }
 
     // Complete the last header

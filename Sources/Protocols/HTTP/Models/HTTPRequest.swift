@@ -30,7 +30,7 @@ open class HTTPRequest: HTTPMessage {
     super.prepareForWrite()
 
     // Write the content length only if we have a body
-    headers.contentLength = body.isEmpty ? nil : body.count
+    headers.contentLength = body.isEmpty ? nil : Int64(exactly: body.count)
   }
 }
 
