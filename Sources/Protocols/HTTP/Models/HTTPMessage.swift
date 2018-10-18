@@ -12,15 +12,17 @@ open class HTTPMessage {
   public var version: HTTPVersion
   public var headers: HTTPHeaders
   public var body: Data
+  public var bodyFile: FileHandle?
 
   internal var firstLine: String { return "" }
   internal var stripBody = false
 
   /// Creates a new HTTPMessage.
-  public init(version: HTTPVersion = .default, headers: HTTPHeaders = .empty, body: Data = Data()) {
+  public init(version: HTTPVersion = .default, headers: HTTPHeaders = .empty, body: Data = Data(), bodyFile: FileHandle? = nil) {
     self.version = version
     self.headers = headers
     self.body = body
+    self.bodyFile = bodyFile
   }
 
   /// Performs last minute changes to the message, just before writing it to the stream.
@@ -62,7 +64,16 @@ open class HTTPMessage {
   /// Writes the body to the provided stream.
   open func writeBody(to stream: WriteStream, timeout: TimeInterval) {
     if !stripBody {
-      stream.write(data: body, timeout: timeout)
+      if let bodyFile = bodyFile {
+        let bufferSize = 5 * 1024
+        var data = bodyFile.readData(ofLength: bufferSize)
+        while data.count > 0 {
+          stream.write(data: data, timeout: timeout)
+          data = bodyFile.readData(ofLength: bufferSize)
+        }
+      } else {
+        stream.write(data: body, timeout: timeout)
+      }
     }
   }
 }

@@ -15,9 +15,9 @@ open class HTTPResponse: HTTPMessage {
 
   /// Initializes a new HTTPResponse
   public init(_ status: HTTPStatus = .ok, version: HTTPVersion = .default,
-              headers: HTTPHeaders = .empty, body: Data = Data()) {
+              headers: HTTPHeaders = .empty, body: Data = Data(), bodyFile: FileHandle? = nil) {
     self.status = status
-    super.init(version: version, headers: headers, body: body)
+    super.init(version: version, headers: headers, body: body, bodyFile: bodyFile)
   }
 
   /// Writes the first line of the response, e.g. HTTP/1.1 200 OK
@@ -32,12 +32,15 @@ open class HTTPResponse: HTTPMessage {
     // Set the date header
     headers.date = Date().rfc1123
 
-    // If a body is allowed set the content length (even when 0)
-    if status.supportsBody {
-      headers.contentLength = body.count
-    } else {
-      headers.contentLength = nil
-      body.count = 0
+    // Files set their content length in HTTPFileHandler
+    if bodyFile == nil {
+        // If a body is allowed set the content length (even when 0)
+        if status.supportsBody {
+          headers.contentLength = Int64(exactly: body.count)!
+        } else {
+          headers.contentLength = nil
+          body.count = 0
+        }
     }
   }
 }
@@ -64,7 +67,7 @@ extension HTTPResponse {
 extension HTTPResponse: CustomStringConvertible {
   open var description: String {
     let typeName = type(of: self)
-    return "<\(typeName): \(version) \(status), headers: \(headers.count), body: \(body.count)>"
+    return "<\(typeName): \(version) \(status), headers: \(headers.count), body: \(body.count) bodyFile: \(bodyFile?.description ?? "None")>"
   }
 }
 

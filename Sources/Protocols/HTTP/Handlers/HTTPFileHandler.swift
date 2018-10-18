@@ -60,11 +60,13 @@ open class HTTPFileHandler: HTTPRequestHandler {
       return HTTPResponse(.forbidden)
     }
 
+    
     // Construct a response
-    let response = HTTPResponse(.ok, body: try Data(contentsOf: url))
+    let response = HTTPResponse(.ok, bodyFile: try FileHandle(forReadingFrom: url))
     response.headers.contentType = fileManager.mimeType(of: url)
     response.headers.lastModified = attributes.fileModificationDate()?.rfc1123
-
+    response.headers.contentLength = Int64(exactly: attributes.fileSize())!
+    
     return response
   }
 }
