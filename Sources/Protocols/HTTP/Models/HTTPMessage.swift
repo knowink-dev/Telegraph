@@ -65,7 +65,7 @@ open class HTTPMessage {
   open func writeBody(to stream: WriteStream, timeout: TimeInterval) {
     if !stripBody {
       if let bodyFile = bodyFile {
-        let bufferSize = 5 * 1024
+        let bufferSize = 50 * 1024
         var data = bodyFile.readData(ofLength: bufferSize)
         while data.count > 0 {
           stream.write(data: data, timeout: timeout)
