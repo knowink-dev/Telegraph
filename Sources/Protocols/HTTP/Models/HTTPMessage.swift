@@ -67,7 +67,7 @@ open class HTTPMessage {
       if let bodyFile = bodyFile {
         let bufferSize = 50 * 1024
         var data = bodyFile.readData(ofLength: bufferSize)
-        while data.count > 0 {
+        while !data.isEmpty {
           stream.write(data: data, timeout: timeout)
           data = bodyFile.readData(ofLength: bufferSize)
         }
