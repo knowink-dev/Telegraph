@@ -69,7 +69,6 @@ open class HTTPFileHandler: HTTPRequestHandler {
       return HTTPResponse(.forbidden)
     }
 
-    
     // Construct a response
     let response = HTTPResponse()
     response.headers.contentType = fileManager.mimeType(of: url)
